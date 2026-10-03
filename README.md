@@ -38,7 +38,7 @@ python3 -m http.server 8080
 
 1. 在 EdgeOne Makers 导入本仓库，或上传仓库根目录内的文件。无需前端构建命令。
 2. 确保 `cloud-functions/api/analyze.js` 位于部署根目录下，使 Makers 识别 `/api/analyze`。
-3. 在项目的服务端环境变量里设置 `AI_GATEWAY_BASE_URL`、`AI_GATEWAY_MODEL` 和 `AI_GATEWAY_API_KEY`，参考 `.env.example`。必须使用账号实际可调用的模型和与网关匹配的凭据。
+3. 在项目的服务端环境变量里设置 `AI_GATEWAY_BASE_URL`、`AI_GATEWAY_MODEL` 和 `AI_GATEWAY_API_KEY`，参考 `.env.example`。本项目当前使用 Agent Plan，必须使用其专属 Base URL、专属 Key 和套餐可调用的模型。
 4. 重新部署使变量生效。输入店铺名和材料，进入调查流程后点击「生成完整报告」。
 5. 检查报告是否显示本次材料的 AI 分析与原文依据。固定合成案例不能视为模型调用成功的证明。
 
@@ -46,7 +46,8 @@ python3 -m http.server 8080
 
 ## 当前状态与限制
 
-- 前端和云函数已经在 Makers 完成部署；最近一次真实模型调用返回上游 401，鉴权尚未通过，不能宣称 AI 已稳定运行。
+- 前端和云函数已经在 Makers 完成部署；2026-10-04 切换 Agent Plan 专属地址与套餐可调用模型后，线上合成材料测试已成功生成 AI 分析草稿。持续可用性仍需在活动期间观察。
+- 当前 Makers 项目尚未关联本 GitHub 仓库；提交到 GitHub 后仍需手动重新部署，或先完成仓库关联。
 - `/api/analyze` 的 GET 返回只证明路由存活，不证明模型密钥、模型权限或额度可用。
 - 无数据库、登录、OCR、联网查档；页面刷新后输入不持久保存。提交文字会传给配置的模型供应商，其数据处理政策需另行核对。
 - 限流仅在单实例内生效。长期公开运行仍需平台级限流、预算控制与运行监控。

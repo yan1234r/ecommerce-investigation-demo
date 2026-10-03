@@ -8,17 +8,19 @@
 
 | 变量 | 示例/填写方式 |
 |---|---|
-| `AI_GATEWAY_BASE_URL` | `https://ark.cn-beijing.volces.com/api/v3`（火山方舟标准模型 API） |
-| `AI_GATEWAY_API_KEY` | 方舟控制台创建的普通应用 API Key，只填入 Makers 控制台，不能放进网页源码或 Git |
-| `AI_GATEWAY_MODEL` | `doubao-seed-2-1-pro-260628`（填写你账号可调用的模型 ID） |
+| `AI_GATEWAY_BASE_URL` | `https://ark.cn-beijing.volces.com/api/plan/v3`（Agent Plan 的 OpenAI 兼容接口） |
+| `AI_GATEWAY_API_KEY` | Agent Plan 专属 API Key，只填入 Makers 控制台，不能放进网页源码或 Git |
+| `AI_GATEWAY_MODEL` | `doubao-seed-2-1-turbo-260628`（本账号 Agent Plan Small 当前资源列表中可调用；以套餐实时列表为准） |
 
-`AI_GATEWAY_BASE_URL` 填到 `/api/v3` 这一层即可，函数会补上 `/chat/completions`。如果填入的地址已经以 `/chat/completions` 结尾，函数也可直接使用。
+`AI_GATEWAY_BASE_URL` 填到 `/api/plan/v3` 这一层即可，函数会补上 `/chat/completions`。如果填入的地址已经以 `/chat/completions` 结尾，函数也可直接使用。
 
-网站运行时应使用与所选网关匹配的应用 API 凭据和模型权限。Coding Plan 的编程工具配置与网站后端配置应分别管理；不要仅凭 Key 的外观判断它适用的套餐或接口。
+EdgeOne Cloud Functions 运行上限为 30 秒。本项目把上游等待设为 25 秒，并对该型号关闭深度思考，以便在现场演示时尽快返回可核验的结构化草稿。超时会返回明确错误，可重试。
+
+网站运行时应使用与所选网关匹配的专属凭据和套餐内模型。Agent Plan、Coding Plan 与普通方舟 API 的 Base URL、API Key 不可混用；不要仅凭 Key 的外观判断它适用的套餐或接口。
 
 ## 部署
 
-1. 将 `static-deploy/` 的内容部署到已经创建的 Makers 项目（或者将这些文件合并到该项目的代码仓库）。确保 `cloud-functions/api/analyze.js` 位于项目根目录下的 `cloud-functions/api/`。
+1. 将本仓库根目录的内容部署到已经创建的 Makers 项目（或者将这些文件合并到该项目的代码仓库）。确保 `cloud-functions/api/analyze.js` 位于项目根目录下的 `cloud-functions/api/`。
 2. 在 Makers 项目环境变量中填写上述变量。此前发到聊天里的 API Key 已暴露，必须先撤销并重新生成，再把新 Key 直接填入 Makers 控制台，不要再发送到聊天。
 3. 触发一次新的部署。环境变量变更不会回写到已经完成的旧部署。
 4. 打开站点首页，输入店铺名，粘贴文字或选择 TXT/MD/CSV/JSON 文件（最多 4 个，单个 100 KB，合计 14000 字符），进入调查后在最后一步点击“生成完整报告”。

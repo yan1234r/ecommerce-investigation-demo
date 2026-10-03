@@ -20,9 +20,9 @@ python3 -m http.server 8080
 
 | 名称 | 内容 |
 | --- | --- |
-| AI_GATEWAY_BASE_URL | 与凭据匹配的 OpenAI Chat Completions 兼容网关地址 |
-| AI_GATEWAY_MODEL | 该账号实际可调用的模型 ID |
-| AI_GATEWAY_API_KEY | 仅保存在服务端的 API Key |
+| AI_GATEWAY_BASE_URL | Agent Plan 使用 `https://ark.cn-beijing.volces.com/api/plan/v3` |
+| AI_GATEWAY_MODEL | 该 Agent Plan 套餐实际可调用的模型 ID，例如 `doubao-seed-2-1-turbo-260628` |
+| AI_GATEWAY_API_KEY | 仅保存在服务端的 Agent Plan 专属 API Key |
 
 `.env.example` 仅为说明模板，上传它不会自动配置云端环境变量。保存变量后要重新部署。
 
@@ -43,7 +43,7 @@ python3 -m http.server 8080
 ## 4. 常见问题
 
 - 503 / 模型尚未配置：检查三个环境变量是否完整，并重新部署。
-- 模型服务 401：上游拒绝鉴权，检查凭据是否有效以及是否匹配当前网关；仅凭 401 不能确定具体根因。
+- 模型服务 401：上游拒绝鉴权，检查凭据是否有效以及是否匹配当前网关；仅凭 401 不能确定具体根因。Agent Plan 需使用专属 API Key、`/api/plan/v3` 和套餐可调用模型；在 Makers 服务端环境变量中修正后重新部署。
 - 403 / 404：检查模型权限、模型 ID、API 地址与账号所属区域，以供应商返回为准。
 - 超时：当前函数请求上限为45秒，减少材料长度或换用账号支持的较快模型。
 - 本地 POST 请求失败：Python 服务仅提供静态文件，真实分析需部署云函数。

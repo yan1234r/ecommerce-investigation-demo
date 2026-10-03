@@ -243,7 +243,7 @@ window.DEMO_DATA = {
     clearTimeout(toastTimer);
     toast.textContent = message;
     toast.classList.add('show');
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 1500);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
   }
 
   function renderHome() {
@@ -312,6 +312,7 @@ window.DEMO_DATA = {
       window.demoQuery = value;
       window.demoMaterials = materials;
       window.liveAnalysis = null;
+      renderReport();
       currentFlowIndex = 0;
       flowView = 'detail';
       renderFlow();
@@ -385,6 +386,9 @@ window.DEMO_DATA = {
         </div>`;
       document.querySelector('#open-history-case').addEventListener('click', () => {
         window.demoQuery = data.query;
+        window.demoMaterials = [];
+        window.liveAnalysis = null;
+        renderReport();
         currentFlowIndex = 0;
         flowView = 'detail';
         renderFlow();
@@ -399,14 +403,14 @@ window.DEMO_DATA = {
           <div class="progress-line"><span id="progress-fill"></span></div>
           <div class="flow-toprow">
             <button class="flow-back" id="flow-back" aria-label="返回">${icons.back}</button>
-            <div class="flow-search">${window.demoQuery || data.query}</div>
+            <div class="flow-search">${escapeText(window.demoQuery || data.query)}</div>
             <div class="flow-step" id="flow-step">第 1 / 7 步</div>
           </div>
         </header>
         <div class="flow-scroller" id="flow-scroller">
           ${data.modules.map((m, idx) => `
             <article class="module-screen" data-index="${idx}" id="module-${m.id}">
-              <div class="module-kicker">模块 0${m.id}</div>
+              <div class="module-kicker">固定合成案例流程 · 模块 0${m.id}</div>
               <h2 class="module-title">${m.name}</h2>
               <div class="conclusion-line level-${m.level}"><span class="risk-dot"></span><span class="type-target" data-text="${m.conclusion}"></span></div>
               ${factMarkup(m)}
@@ -457,8 +461,9 @@ window.DEMO_DATA = {
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ storeName: window.demoQuery || data.query, materials: window.demoMaterials || [] }),
         });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || '分析暂时失败，请稍后重试。');
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || 'AI 接口不可用，请检查云函数部署和模型配置。');
+        if (!result.report || !Array.isArray(result.report.findings)) throw new Error('AI 返回的报告格式无效，请稍后重试。');
         window.liveAnalysis = result;
         renderReport();
         location.hash = '#/report';
@@ -643,7 +648,13 @@ window.DEMO_DATA = {
       setTimeout(() => scrollToModule(currentFlowIndex, false), 80);
     }));
     document.querySelector('#export-report').addEventListener('click', () => showToast('演示版暂不支持导出'));
-    document.querySelector('#restart').addEventListener('click', () => location.hash = '#/home');
+    document.querySelector('#restart').addEventListener('click', () => {
+      window.demoQuery = null;
+      window.demoMaterials = [];
+      window.liveAnalysis = null;
+      renderReport();
+      location.hash = '#/home';
+    });
   }
 
   function route() {
