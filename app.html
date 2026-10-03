@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#161823" />
+<title>电商真实经营调查 Agent · APP Demo</title>
+<style>
+:root{
+  --primary:#fe2c55;
+  --bg:#161823;
+  --bg-nav:#060716;
+  --bg-elev:#252632;
+  --bg-elev-2:#2f303d;
+  --bg-hover:rgba(255,255,255,.08);
+  --text:#fff;
+  --text-1:rgba(255,255,255,.9);
+  --text-2:rgba(255,255,255,.75);
+  --text-3:rgba(255,255,255,.6);
+  --text-4:rgba(255,255,255,.34);
+  --line:rgba(255,255,255,.08);
+  --line-2:rgba(255,255,255,.14);
+  --success:#13c15a;
+  --warning:#ff851d;
+  --cyan:#25f4ee;
+  --nav-w:160px;
+  --header-h:56px;
+  --r-sm:8px;
+  --r-md:12px;
+  --r-lg:16px;
+  --font:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box} html,body{margin:0;min-height:100%;background:var(--bg);font-family:var(--font);color:var(--text)}
+body{min-width:1024px;overflow-x:hidden} button,input{font:inherit} button{color:inherit} svg{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.web-shell{min-height:100vh;background:var(--bg)}
+.tabbar{position:fixed;z-index:60;left:0;top:0;bottom:0;width:var(--nav-w);padding:16px 12px 18px;background:var(--bg-nav);border-right:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;gap:6px}
+.tabbar:before{content:"真实经营调查";height:42px;display:flex;align-items:center;padding:0 12px 12px;font-size:18px;font-weight:700;letter-spacing:.2px;color:#fff;border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:10px}
+.tab{height:44px;border:0;background:transparent;border-radius:12px;display:flex;align-items:center;gap:12px;padding:0 12px;color:var(--text-3);cursor:pointer;transition:.16s ease;font-size:15px;font-weight:500;text-align:left}
+.tab:hover{background:var(--bg-hover);color:var(--text-1)} .tab.active{background:rgba(255,255,255,.12);color:#fff;font-weight:600}.tab svg{width:22px;height:22px;flex:none}.tab span{white-space:nowrap}
+.web-topbar{position:fixed;z-index:55;left:var(--nav-w);right:0;top:0;height:var(--header-h);display:flex;align-items:center;padding:0 24px;background:rgba(22,24,35,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.web-topbar-inner{width:100%;display:grid;grid-template-columns:minmax(280px,560px) 1fr auto;align-items:center;gap:20px}
+.web-search{height:40px;border-radius:12px;background:rgba(255,255,255,.08);display:flex;align-items:center;overflow:hidden;border:1px solid transparent;transition:.16s}.web-search:focus-within{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.1)}
+.web-search input{flex:1;height:100%;border:0;outline:0;background:transparent;color:#fff;padding:0 14px;font-size:14px}.web-search input::placeholder{color:var(--text-4)}
+.web-search button{width:72px;height:32px;margin-right:4px;border:0;border-radius:9px;background:rgba(255,255,255,.09);color:var(--text-1);cursor:pointer}.web-search button:hover{background:rgba(255,255,255,.14)}
+.topbar-meta{justify-self:end;display:flex;align-items:center;gap:8px}.topbar-pill{height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line-2);background:transparent;color:var(--text-2);font-size:13px;display:flex;align-items:center}.topbar-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#2b2d3a,#4a4c5d);display:grid;place-items:center;font-weight:700;font-size:13px}
+.stage{position:relative;margin-left:var(--nav-w);padding-top:var(--header-h);min-height:100vh;background:var(--bg);width:calc(100% - var(--nav-w));max-width:none;box-shadow:none;overflow:visible}
+.page{display:none;min-height:calc(100vh - var(--header-h));opacity:0;transition:opacity .15s ease}.page.active{display:block;opacity:1}.page.is-leaving{opacity:0}
+.toast{position:fixed;z-index:100;left:calc(var(--nav-w) + (100vw - var(--nav-w))/2);bottom:34px;transform:translate(-50%,12px);padding:10px 16px;border-radius:999px;background:#2f3035;color:#fff;font-size:14px;box-shadow:0 8px 32px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:translate(-50%,0)}
+.btn-primary,.btn-ghost{height:42px;border-radius:8px;padding:0 20px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s}.btn-primary{border:0;background:var(--primary);color:#fff}.btn-primary:hover{background:#d21b46}.btn-primary:active{background:#a50e37}.btn-ghost{border:1px solid var(--line-2);background:rgba(255,255,255,.04);color:var(--text-1)}.btn-ghost:hover{background:var(--bg-hover)}
+/* home */
+.home-shell{min-height:calc(100vh - var(--header-h));background:var(--bg)}
+.home-content{max-width:1180px;margin:0 auto;padding:42px 40px 120px}
+.hero-card{background:transparent;padding:26px 0 8px;max-width:930px}.hero-kicker{font-size:14px;color:var(--primary);font-weight:600;margin-bottom:14px}.hero-card h1{margin:0;font-size:42px;line-height:1.18;letter-spacing:-1px;font-weight:700;color:#fff}.hero-card p{margin:16px 0 0;color:var(--text-3);font-size:16px;line-height:1.7}
+.query-box{margin-top:28px;width:min(760px,100%);background:var(--bg-elev);border-radius:16px;padding:10px 12px 12px;border:1px solid rgba(255,255,255,.06);box-shadow:0 10px 40px rgba(0,0,0,.16)}
+.evidence-input{display:grid;gap:8px;padding:12px 2px 2px}.evidence-input label{font-size:12px;color:var(--text-2)}.evidence-input textarea{width:100%;min-height:96px;resize:vertical;border:1px solid var(--line-2);border-radius:9px;background:rgba(0,0,0,.14);color:var(--text-1);padding:10px;font:inherit;font-size:13px;line-height:1.55}.evidence-input input[type=file]{max-width:100%;font-size:12px;color:var(--text-3)}.evidence-input small{font-size:11px;line-height:1.55;color:var(--text-4)}
+.query-input-row{height:48px;display:flex;align-items:center;gap:10px}.query-input-row>svg{width:20px;height:20px;color:var(--text-3);margin-left:4px}.query-input-row input{flex:1;border:0;outline:0;background:transparent;color:#fff;font-size:16px}.query-input-row input::placeholder{color:var(--text-4)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;padding-top:9px;border-top:1px solid var(--line)}.chip{border:0;border-radius:8px;background:rgba(255,255,255,.06);color:var(--text-3);font-size:12px;padding:7px 10px;cursor:pointer}.chip:hover{background:rgba(255,255,255,.1);color:var(--text-1)}
+.insight-marquee{margin-top:38px;width:100%;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);padding:4px 0}.insight-track{display:flex;width:max-content;gap:10px;animation:ticker 35s linear infinite}.insight-marquee:hover .insight-track{animation-play-state:paused}.insight-tag{flex:none;padding:10px 14px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--text-2);font-size:13px}.insight-tag.hot{color:#ff9db0;background:rgba(254,44,85,.08);border-color:rgba(254,44,85,.18)}@keyframes ticker{to{transform:translateX(-50%)}}
+.home-cta{max-width:1180px;margin:0 auto;padding:0 40px 40px;display:flex;align-items:center;gap:14px}.home-cta .btn-primary{min-width:150px}.disclaimer{color:var(--text-4);font-size:12px}
+/* history */
+.history-shell{max-width:1180px;margin:0 auto;padding:34px 40px 70px}.history-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px}.history-header h1{font-size:28px;margin:0 0 8px}.history-header p{margin:0;color:var(--text-3);font-size:14px}.history-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.history-card{border:1px solid var(--line);background:var(--bg-elev);border-radius:14px;padding:0;text-align:left;overflow:hidden;cursor:pointer;transition:.18s}.history-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.16);background:#292a36;box-shadow:0 12px 32px rgba(0,0,0,.22)}
+.shop-head{display:flex;align-items:center;gap:12px;padding:18px}.shop-avatar{width:44px;height:44px;border-radius:50%;background:#fff;color:#111;display:grid;place-items:center;font-weight:800}.shop-meta{flex:1;min-width:0}.shop-name{font-size:16px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.shop-sub{font-size:12px;color:var(--text-4);margin-top:5px}.history-enter{font-size:13px;color:#ff8099}.history-meta{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.history-cell{padding:14px 16px;min-width:0}.history-cell+ .history-cell{border-left:1px solid var(--line)}.history-cell span{display:block;font-size:12px;color:var(--text-4);margin-bottom:7px}.history-cell b{font-size:13px;font-weight:600;color:var(--text-1)}.history-cell .history-risk{color:#ff6c88}.history-foot{padding:12px 16px;display:flex;justify-content:space-between;color:var(--text-4);font-size:12px}
+/* flow */
+.flow-page{position:relative;height:calc(100vh - var(--header-h));overflow:hidden;background:var(--bg)}
+.flow-header{position:absolute;z-index:20;left:0;right:0;top:0;height:64px;background:rgba(22,24,35,.96);border-bottom:1px solid var(--line);display:flex;align-items:flex-end}.progress-line{position:absolute;left:0;right:0;bottom:0;height:2px;background:rgba(255,255,255,.05)}.progress-line span{display:block;height:100%;background:var(--primary);transition:.25s}
+.flow-toprow{width:100%;height:62px;display:flex;align-items:center;padding:0 24px;gap:12px}.flow-back{width:36px;height:36px;border-radius:10px;border:0;background:transparent;color:var(--text-2);display:grid;place-items:center;cursor:pointer}.flow-back:hover{background:var(--bg-hover);color:#fff}.flow-back svg{width:20px}.flow-search{height:36px;min-width:260px;max-width:480px;flex:1;border-radius:10px;background:rgba(255,255,255,.08);display:flex;align-items:center;padding:0 14px;color:var(--text-2);font-size:13px}.flow-step{font-size:12px;color:var(--text-4);white-space:nowrap}
+.flow-scroller{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;padding-top:64px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent}.module-screen{min-height:calc(100vh - var(--header-h) - 64px);scroll-snap-align:start;position:relative;padding:54px max(110px,calc((100vw - var(--nav-w) - 980px)/2)) 70px;display:flex;flex-direction:column;justify-content:center}.module-screen:before{content:"";position:absolute;inset:22px max(70px,calc((100vw - var(--nav-w) - 1060px)/2));border:1px solid var(--line);border-radius:16px;pointer-events:none}.module-kicker,.module-title,.conclusion-line,.fact-list,.source-row,.generate-wrap{position:relative;z-index:1;max-width:860px}.module-kicker{font-size:12px;color:var(--text-4);letter-spacing:.6px}.module-title{margin:8px 0 12px;font-size:34px;line-height:1.2}.conclusion-line{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;margin-bottom:22px}.risk-dot{width:8px;height:8px;border-radius:50%;background:currentColor}.level-high{color:#ff5475}.level-medium{color:#ff9c42}.level-normal{color:#43d680}
+.fact-list{display:grid;gap:10px}.fact-card,.rating-card,.timeline,.chain-flow,.legal-grid{background:var(--bg-elev);border:1px solid var(--line);border-radius:12px}.fact-card{padding:15px 16px;color:var(--text-1);font-size:14px;line-height:1.65}.fact-card strong{display:block;margin-bottom:6px}.rating-card{padding:4px 16px}.rating-row{min-height:48px;display:grid;grid-template-columns:110px 50px 1fr;align-items:center;border-bottom:1px solid var(--line)}.rating-row:last-child{border:0}.rating-name{font-size:13px;color:var(--text-3)}.rating-score{font-size:14px;font-weight:600}.stars{display:flex;gap:3px}.star{width:15px;height:15px;color:rgba(255,255,255,.18)}.star.on{color:var(--primary);fill:var(--primary)}
+.timeline{padding:8px 16px}.timeline-item{position:relative;display:grid;grid-template-columns:90px 1fr;gap:18px;padding:14px 0 14px 22px;border-bottom:1px solid var(--line)}.timeline-item:last-child{border:0}.timeline-item:before{content:"";position:absolute;left:4px;top:0;bottom:0;width:1px;background:rgba(255,255,255,.14)}.timeline-node{position:absolute;left:0;top:20px;width:9px;height:9px;border-radius:50%;background:var(--primary);z-index:2}.timeline-node.debt{background:var(--cyan)}.timeline-date{font-size:12px;color:var(--text-4)}.timeline-text{font-size:14px;color:var(--text-1)}
+.chain-flow{padding:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.chain-node{padding:12px;border-radius:8px;background:rgba(255,255,255,.05);font-size:13px;text-align:center;color:var(--text-2)}.legal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);overflow:hidden}.legal-block{background:var(--bg-elev);padding:16px}.legal-block b{display:block;font-size:12px;color:var(--text-4);margin-bottom:8px}.legal-block span{font-size:14px;line-height:1.6;color:var(--text-1)}
+.source-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:18px}.source-prefix{font-size:12px;color:var(--text-4)}.source-chip{padding:5px 9px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--text-3);font-size:11px}.generate-wrap{margin-top:18px}.action-rail{position:absolute;z-index:4;right:max(88px,calc((100vw - var(--nav-w) - 1020px)/2));top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:12px}.rail-action{width:50px;border:0;background:transparent;color:var(--text-3);display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}.rail-icon{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.08);display:grid;place-items:center;transition:.15s}.rail-icon svg{width:18px;height:18px}.rail-action:hover .rail-icon{background:rgba(255,255,255,.14);color:#fff}.rail-action.saved .rail-icon{background:rgba(254,44,85,.14);color:var(--primary)}.rail-label{font-size:11px}.reveal{opacity:0;transform:translateY(12px)}.module-screen.play .reveal{animation:reveal .38s ease forwards}.module-screen.play .reveal:nth-of-type(2){animation-delay:.08s}.module-screen.play .reveal:nth-of-type(3){animation-delay:.16s}@keyframes reveal{to{opacity:1;transform:none}}
+/* report */
+.live-analysis{grid-column:1/-1;border:1px solid rgba(37,244,238,.24);background:linear-gradient(140deg,rgba(37,244,238,.06),rgba(254,44,85,.04));border-radius:14px;padding:18px}.live-analysis-note{font-size:12px;color:var(--text-3);line-height:1.6;margin:-4px 0 14px}.live-finding{border-top:1px solid var(--line);padding:14px 0}.live-finding:first-of-type{border-top:0}.live-finding h3{font-size:14px;margin:0 0 8px;display:flex;gap:9px;align-items:center}.live-finding p{font-size:13px;line-height:1.65;color:var(--text-2);margin:6px 0}.live-finding blockquote{margin:7px 0;padding:8px 10px;border-left:2px solid var(--cyan);background:rgba(255,255,255,.035);font-size:12px;line-height:1.6;color:var(--text-3);white-space:pre-wrap}.live-status{font-size:11px;color:var(--text-4)}.live-analysis + .score-hero{border-style:dashed}.live-analysis + .score-hero:before{content:"以下为固定合成案例参考，不属于本次材料分析";display:block;margin-bottom:12px;color:var(--text-4);font-size:12px}
+.report-shell{min-height:calc(100vh - var(--header-h));background:var(--bg)}.report-header{height:74px;max-width:1180px;margin:0 auto;padding:0 40px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line)}.report-header h1{font-size:24px;margin:0}.report-badge{padding:5px 8px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--text-3);font-size:11px}.report-content{max-width:1180px;margin:0 auto;padding:24px 40px 110px;display:grid;grid-template-columns:1.08fr .92fr;gap:16px;align-items:start}.score-hero{grid-column:1/-1;background:var(--bg-elev);border:1px solid var(--line);border-radius:16px;padding:24px}.score-top{display:flex;align-items:center;gap:26px}.score-ring{width:146px;height:146px;position:relative;flex:none}.score-ring svg{width:100%;height:100%;transform:rotate(-90deg)}.score-ring circle{fill:none;stroke-width:8}.ring-bg{stroke:rgba(255,255,255,.08)}.ring-value{stroke:var(--primary);stroke-dasharray:263.89;stroke-dashoffset:97.64;stroke-linecap:round}.score-center{position:absolute;inset:0;display:flex;align-items:baseline;justify-content:center;padding-top:46px}.score-number{font-size:42px;font-weight:700}.score-unit{font-size:13px;color:var(--text-4);margin-left:4px}.score-summary{max-width:520px}.score-label{font-size:12px;color:var(--text-4)}.score-grade{font-size:28px;font-weight:700;margin-top:7px}.score-desc{font-size:14px;line-height:1.65;color:var(--text-3);margin-top:9px}.score-logic{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.score-logic-title{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600}.score-logic-note{font-size:11px;color:var(--text-4);font-weight:400}.score-row{background:rgba(255,255,255,.04);padding:12px;border-radius:8px}.score-row-name{display:block;font-size:11px;color:var(--text-4);margin-bottom:6px}.score-row b{font-size:16px}.insider-rules{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px}.insider-rule{padding:10px;border-radius:8px;background:rgba(254,44,85,.07);color:#ff9aae;font-size:12px;line-height:1.5}.insider-rule strong{color:#fff}.report-banner,.section-card{background:var(--bg-elev);border:1px solid var(--line);border-radius:14px;padding:18px}.report-banner{grid-column:1/-1}.banner-main{display:flex;align-items:center;gap:8px;color:#ff6684;font-size:16px;font-weight:600}.banner-sub{margin-top:8px;font-size:12px;color:var(--text-4)}.section-title{font-size:15px;font-weight:600;margin-bottom:14px}.overview-row{width:100%;height:50px;border:0;border-top:1px solid var(--line);background:transparent;display:grid;grid-template-columns:42px 1fr auto;align-items:center;text-align:left;cursor:pointer;color:inherit}.overview-row:first-of-type{border-top:0}.overview-row:hover{background:rgba(255,255,255,.04)}.overview-no{font-size:11px;color:var(--text-4)}.overview-name{font-size:13px}.overview-status{font-size:12px}.report-timeline .timeline{border:0;background:transparent;padding:0}.evidence-chain{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.evidence-node{padding:9px 10px;border-radius:7px;background:rgba(255,255,255,.06);font-size:12px;color:var(--text-2)}.evidence-node:last-child{color:#ff7790}.evidence-arrow svg{width:16px;height:16px;color:var(--text-4)}.next-list{display:grid;gap:10px}.next-item{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--text-2)}.next-square{width:6px;height:6px;border-radius:2px;background:var(--primary)}.report-actions{position:fixed;z-index:30;right:24px;bottom:24px;display:flex;gap:8px;padding:8px;border-radius:12px;background:rgba(37,38,50,.92);border:1px solid var(--line);backdrop-filter:blur(12px)}
+@media(max-width:1180px){.history-list{grid-template-columns:1fr}.report-content{grid-template-columns:1fr}.score-hero,.report-banner{grid-column:1}.module-screen{padding-left:80px;padding-right:120px}.module-screen:before{left:46px;right:70px}.action-rail{right:82px}}
+
+/* APP layout: original Web tokens and content retained. */
+:root{--nav-w:0px;--header-h:60px;--bottom-h:calc(64px + env(safe-area-inset-bottom,0px))}
+html{color-scheme:dark}body{min-width:0;overflow-x:hidden}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}input{min-width:0}button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.web-shell{max-width:600px;margin:auto}.stage{margin:0;width:100%;padding-top:calc(var(--header-h) + env(safe-area-inset-top,0px));padding-bottom:var(--bottom-h);min-height:100dvh}
+.tabbar{left:50%;top:auto;bottom:0;transform:translateX(-50%);width:100%;max-width:600px;height:var(--bottom-h);padding:5px 12px calc(5px + env(safe-area-inset-bottom,0px));flex-direction:row;gap:8px;border-right:0;border-top:1px solid var(--line)}.tabbar:before{display:none}.tab{flex:1;height:54px;flex-direction:column;justify-content:center;gap:3px;padding:4px;font-size:11px;border-radius:10px}.tab svg{width:23px;height:23px}.tab.active{background:rgba(255,255,255,.12)}
+.web-topbar{left:50%;transform:translateX(-50%);width:100%;max-width:600px;right:auto;height:calc(var(--header-h) + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 16px 0}.web-topbar-inner{display:flex;gap:10px}.web-search{flex:1;min-width:0;height:38px}.web-search input{width:0;font-size:16px;padding:0 12px}.web-search button{width:52px;flex:none}.topbar-meta{flex:none}.topbar-pill{font-size:10px;padding:0 7px}.topbar-avatar,.web-topbar-inner>div:nth-child(2){display:none}
+.page,.home-shell,.report-shell{min-height:calc(100dvh - var(--header-h) - var(--bottom-h) - env(safe-area-inset-top,0px))}.home-shell{display:flex;flex-direction:column}.home-content{width:100%;padding:40px 20px 28px;flex:1}.hero-card{padding:12px 0 8px}.hero-kicker{font-size:12px;margin-bottom:18px}.hero-card h1{font-size:clamp(25px,7.45vw,36px);line-height:1.45;letter-spacing:-.6px}.hero-card p{font-size:13px;line-height:1.8;margin-top:14px}.query-box{margin-top:28px;padding:8px 10px 12px;border-radius:16px}.query-input-row{gap:7px}.query-input-row input{width:0;font-size:16px}.query-input-row>svg{flex:none}.chips{gap:8px}.chip{font-size:11px;min-height:36px;padding:8px}.insight-marquee{margin-top:28px}.insight-tag{font-size:12px;padding:10px 12px}.home-cta{width:100%;padding:16px 20px 28px;flex-direction:column;gap:12px}.home-cta .btn-primary{width:100%;height:48px}.btn-primary,.btn-ghost{min-height:44px}.disclaimer{font-size:11px}
+.history-shell{padding:26px 16px 28px}.history-header{display:block;margin-bottom:22px}.history-header h1{font-size:23px;margin-bottom:10px}.history-header p{font-size:12px}.history-list{grid-template-columns:1fr}.shop-head{padding:16px 12px;gap:9px}.shop-avatar{width:36px;height:36px;flex:none}.shop-name{font-size:13px;white-space:normal;line-height:1.5}.shop-sub{font-size:10px;line-height:1.5}.history-enter{font-size:12px;flex:none}.history-cell{padding:13px 9px}.history-cell span{font-size:10px}.history-cell b{font-size:11px;line-height:1.6}.history-foot{font-size:11px;padding:12px}
+.flow-page{height:calc(100dvh - var(--header-h) - var(--bottom-h) - env(safe-area-inset-top,0px))}.flow-header{height:100px;display:block}.flow-toprow{height:54px;padding:0 10px;gap:6px}.flow-back{flex:none;width:32px;min-height:44px}.flow-search{min-width:0;font-size:11px;padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;line-height:36px}.flow-step{font-size:10px}.step-nav{display:flex;gap:6px;overflow-x:auto;padding:0 12px 6px;scrollbar-width:none}.step-nav::-webkit-scrollbar{display:none}.step-button{flex:none;min-height:38px;border:1px solid var(--line);background:var(--bg-elev);border-radius:8px;padding:0 10px;font-size:11px;color:var(--text-3)}.step-button[aria-current="step"]{background:rgba(254,44,85,.14);color:#ff8099;border-color:rgba(254,44,85,.3)}
+.flow-scroller{position:absolute;top:100px;bottom:0;left:0;right:0;height:auto;padding-top:0;scroll-snap-type:y proximity;overscroll-behavior-y:contain}.module-screen{min-height:100%;padding:24px 16px 20px;justify-content:flex-start;scroll-snap-align:start}.module-screen:before{display:none}.module-kicker{font-size:10px}.module-title{font-size:27px;margin:8px 0 12px}.conclusion-line{font-size:13px;line-height:1.6;margin-bottom:18px}.risk-dot{flex:none}.fact-list{gap:8px}.fact-card{font-size:13px;padding:12px 13px;line-height:1.75}.rating-card{padding:3px 12px}.rating-row{grid-template-columns:88px 44px 1fr;min-height:44px}.rating-name{font-size:12px}.timeline{padding:4px 12px}.timeline-item{grid-template-columns:62px 1fr;gap:10px;padding:13px 0 13px 17px}.timeline-date{font-size:10px;line-height:1.7}.timeline-text{font-size:12px;line-height:1.7}.chain-flow{grid-template-columns:1fr 1fr;padding:10px}.chain-node{padding:12px 8px;font-size:12px;line-height:1.7}.legal-grid{grid-template-columns:1fr}.legal-block{padding:13px}.legal-block span{font-size:13px}.source-row{gap:6px;margin-top:14px}.source-chip{font-size:10px}.action-rail{position:static;transform:none;flex-direction:row;justify-content:flex-end;gap:12px;margin-top:18px;padding-top:12px;border-top:1px solid var(--line)}.rail-action{width:auto;min-width:62px;min-height:44px;flex-direction:row;gap:6px}.rail-icon{width:28px;height:28px}.rail-icon svg{width:15px}.generate-wrap .btn-primary{width:100%}
+.report-header{height:64px;padding:0 16px}.report-header h1{font-size:23px}.report-content{padding:16px 16px 22px;display:grid;grid-template-columns:1fr;gap:12px}.score-hero{padding:16px;border-radius:16px}.score-top{gap:13px}.score-ring{width:112px;height:112px}.score-center{padding-top:36px}.score-number{font-size:31px}.score-unit{font-size:10px}.score-label{font-size:10px}.score-grade{font-size:21px}.score-desc{font-size:11px;line-height:1.7;margin-top:8px}.score-logic{grid-template-columns:1fr 1fr;gap:8px;margin-top:18px;padding-top:16px}.score-logic-title{align-items:flex-start;gap:8px;flex-direction:column;font-size:13px}.score-logic-note{font-size:10px}.score-row{padding:11px 9px}.score-row-name{font-size:10px}.score-row b{font-size:15px}.insider-rules{grid-template-columns:1fr 1fr}.insider-rule{font-size:11px;padding:9px}.report-banner,.section-card{padding:15px}.banner-main{font-size:14px;line-height:1.65}.banner-sub{font-size:10px;line-height:1.7}.section-title{font-size:14px}.overview-row{min-height:48px;grid-template-columns:28px 1fr auto}.overview-name{font-size:12px}.overview-status{font-size:11px}.report-actions{position:static;margin:0 16px 20px;padding:0;background:transparent;border:0;backdrop-filter:none}.report-actions button{flex:1}.toast{left:50%;bottom:calc(var(--bottom-h) + 16px);max-width:calc(100vw - 32px);width:max-content;font-size:12px}
+@media(hover:none){.history-card:hover{transform:none;box-shadow:none;background:var(--bg-elev)}.btn-primary:hover{background:var(--primary)}.tab:hover{background:transparent;color:var(--text-3)}.tab.active:hover{background:rgba(255,255,255,.12);color:white}}
+button:active,.history-card:active,.overview-row:active,.chip:active{filter:brightness(.8);transform:scale(.985)}.btn-primary:active{background:#a50e37}.insight-marquee:active .insight-track{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition:none!important;scroll-behavior:auto!important}.insight-track{animation:none}.insight-marquee{overflow:auto}.reveal{opacity:1;transform:none}}
+
+.full-width{grid-column:1/-1}.table-scroll{max-width:100%;overflow-x:auto}.check-table{width:100%;border-collapse:collapse;font-size:12px;line-height:1.55;color:var(--text-2)}.check-table th,.check-table td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;min-width:120px}.check-table th{color:var(--text-4);font-weight:600}.check-table td:first-child,.check-table th:first-child{min-width:90px;white-space:nowrap}.check-list{margin:0;padding-left:20px;display:grid;gap:9px;color:var(--text-2);font-size:13px;line-height:1.6}.small-note{margin-top:10px;color:var(--text-4);font-size:11px;line-height:1.65}.rating-note{font-size:11px;color:var(--text-4)}.rating-row{grid-template-columns:110px 50px 1fr}.classification-list{display:grid;gap:10px}.classification-item{display:grid;gap:5px;padding:12px;border-radius:9px;background:rgba(255,255,255,.04);font-size:13px;line-height:1.6}.classification-item strong{color:var(--text-1)}.classification-item span{color:var(--text-3)}
+</style>
+</head>
+<body>
+<div class="web-shell">
+  <nav class="tabbar" aria-label="主导航">
+    <button class="tab" data-route="#/home" aria-label="首页"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5v9A1.5 1.5 0 0 1 19.5 21h-15A1.5 1.5 0 0 1 3 19.5z"/><path d="M9 21v-6h6v6"/></svg><span>首页</span></button>
+    <button class="tab" data-route="#/flow" aria-label="调查"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/><path d="M8.5 11h5M11 8.5v5"/></svg><span>调查</span></button>
+    <button class="tab" data-route="#/report" aria-label="报告"><svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4M9 11h6M9 15h6"/></svg><span>报告</span></button>
+  </nav>
+  <header class="web-topbar">
+    <div class="web-topbar-inner">
+      <div class="web-search"><input id="global-search-input" placeholder="搜索企业或抖音店铺" /><button id="global-search-btn">搜索</button></div>
+      <div></div>
+      <div class="topbar-meta"><div class="topbar-pill">合成数据演示</div><div class="topbar-avatar">AI</div></div>
+    </div>
+  </header>
+  <main class="stage">
+    <section id="page-home" class="page"></section>
+    <section id="page-flow" class="page"></section>
+    <section id="page-report" class="page"></section>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </main>
+</div>
+<script>
+window.DEMO_DATA = {
+  case01: {
+    query: 'MARDI LADIN 服装旗舰店',
+    date: '2026-10-03',
+    risk: 'pending',
+    headline: '合成演示案例：经营结论均未由真实材料核验',
+    shop: {
+      name: 'MARDI LADIN 服装旗舰店',
+      category: '女装',
+      score: '4.8',
+      salesHint: '近90天月均销售约60万',
+      badge: '抖音店铺示例'
+    },
+    modules: [
+      {
+        id: 1,
+        name: '主体',
+        conclusion: '主体对应关系：仅为合成设定，现实关系无法判断',
+        level: 'medium',
+        keyword: '无法判断',
+        facts: [
+          '演示设定：债务主体为 XX 服饰有限公司；无真实债务文书',
+          '演示设定：店铺资质主体与债务主体一致；无真实资质页',
+          '实际控制人关系：无股权或控制关系材料，无法判断'
+        ],
+        sources: ['模拟工商标签（非原件）', '模拟店铺页标签（非原件）']
+      },
+      {
+        id: 2,
+        name: '经营状态',
+        conclusion: '经营指标缺少口径与历史基准，无法判断趋势',
+        level: 'medium',
+        keyword: '缺口待核',
+        facts: [
+          '成立年限：注册日期未提供，无法核实',
+          '差评占比 17%：差评定义、分子分母和期间缺失；15% 阈值无依据',
+          '经营范围变更：变更内容及原始公示材料缺失'
+        ],
+        ratings: [
+          { label: '商品体验', score: 4.6, stars: 4 },
+          { label: '物流体验', score: 4.9, stars: 5 },
+          { label: '服务体验', score: 4.8, stars: 5 },
+          { label: '店铺口碑', score: 4.8, stars: 4 }
+        ],
+        sources: ['合成评分字段（无观测原件）', '模拟工商标签（非原件）']
+      },
+      {
+        id: 3,
+        name: '财务真实状态',
+        conclusion: '300 万与 60 万口径不明，无法比较',
+        level: 'high',
+        keyword: '无法比较',
+        facts: [
+          'Demo 字段含“月收入 300 万”陈述；原文、主体和期间缺失',
+          'Demo 字段含“近 90 天月均销售约 60 万”；来源及算法缺失',
+          '库存与销量：数值、单位和时点均缺失，无法比较',
+          '结论：不能据当前合成字段判断经营不一致或财务造假'
+        ],
+        sources: ['模拟陈述标签（非原件）', '模拟经营信号标签（非原件）']
+      },
+      {
+        id: 4,
+        name: '异常变化',
+        conclusion: '时间线为合成设定；事件与数值均待原始材料核验',
+        level: 'high',
+        keyword: '演示时间线',
+        timeline: [
+          { date: '2025-06', text: '债务形成', debt: true },
+          { date: '2025-09', text: '原店铺销量下降约 70%' },
+          { date: '2025-10', text: '关联公司 XX 鞋服商贸成立' },
+          { date: '2025-11', text: '新店铺开业，承接同女装类目' }
+        ],
+        sources: ['模拟店铺页标签（非原件）', '模拟工商标签（非原件）', '模拟债务标签（非原件）']
+      },
+      {
+        id: 5,
+        name: '资产转移线索',
+        conclusion: '经营迁移关系缺少独立关联与连续性材料',
+        level: 'high',
+        keyword: '无法判断',
+        chain: ['原主体变化：无原始数据', '新主体增长：无原始数据', '主体关联：未证明', '业务连续：无重合样本'],
+        facts: ['合成时间线不证明现实中的关联、承接或资产转移；不得输出定性结论'],
+        sources: ['合成模块字段（非独立证据）']
+      },
+      {
+        id: 6,
+        name: '法律尽调',
+        conclusion: '证据缺口集中在资金关系',
+        level: 'medium',
+        keyword: '证据缺口',
+        legal: {
+          fact: 'Demo 内置了债务及经营变化叙述；没有对应原始材料，不能作为现实事实',
+          relation: '主体关联、业务连续性及承接关系均无法判断',
+          gap: '缺店铺历史主体、平台结算、合同和资金往来等直接材料',
+          next: ['店铺历史经营主体', '平台结算主体', '合同主体', '双方资金往来']
+        },
+        sources: ['前五步调查结果']
+      },
+      {
+        id: 7,
+        name: '调查总控',
+        conclusion: '演示流程可展示；材料覆盖与现实结论均未核验',
+        level: 'medium',
+        keyword: '关键证据待补',
+        facts: ['已展示七个分析模块', '合成字段不等于已取得证据', '评分规则未确认，暂不评分', '缺口按无法判断或无法比较呈现'],
+        next: ['核查平台结算主体', '核查双方资金往来记录'],
+        sources: ['前六步调查结果']
+      }
+    ]
+  }
+};
+
+</script>
+<script>
+(() => {
+  const data = window.DEMO_DATA.case01;
+  const pages = {
+    home: document.querySelector('#page-home'),
+    flow: document.querySelector('#page-flow'),
+    report: document.querySelector('#page-report')
+  };
+  const toast = document.querySelector('#toast');
+  const tabs = [...document.querySelectorAll('.tab')];
+  let toastTimer = 0;
+  let currentFlowIndex = 0;
+  let flowView = 'history';
+
+  const escapeText = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  const icons = {
+    search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>',
+    target: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>',
+    pulse: '<svg viewBox="0 0 24 24"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg>',
+    clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg>',
+    file: '<svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4M9 11h6M9 15h6"/></svg>',
+    back: '<svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg>',
+    quote: '<svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4M9 11h6M9 15h6"/></svg>',
+    chat: '<svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>',
+    star: '<svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg>',
+    arrow: '<svg viewBox="0 0 24 24"><path d="M5 12h13M14 8l4 4-4 4"/></svg>'
+  };
+
+  function showToast(message) {
+    clearTimeout(toastTimer);
+    toast.textContent = message;
+    toast.classList.add('show');
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1500);
+  }
+
+  function renderHome() {
+    const tags = [
+      ['主体关系有何依据？', false],
+      ['评分缺少历史对照', true],
+      ['评价口径是否完整？', false],
+      ['经营数据能否比较？', true],
+      ['变化是否有前后数据？', false],
+      ['关联关系是否闭环？', false],
+      ['来源材料是否可追溯？', true],
+      ['结算主体是否一致？', false]
+    ];
+    const ticker = [...tags, ...tags].map(([t, hot]) => `<span class="insight-tag ${hot ? 'hot' : ''}">${t}</span>`).join('');
+    pages.home.innerHTML = `
+      <div class="home-shell">
+        <div class="home-content">
+          <section class="hero-card">
+            <div class="hero-kicker">电商经营核验助手 · 合成演示版</div>
+            <h1>拆解经营信号<br>看清证据与缺口</h1>
+            <p>按可核验事实、待核线索与无法判断整理商家经营材料。</p>
+            <div class="query-box">
+              <div class="query-input-row">${icons.search}<input id="query-input" autocomplete="off" placeholder="输入企业名称或抖音店铺名" /></div>
+              <div class="chips">
+                <button class="chip" data-fill="MARDI LADIN 服装旗舰店">MARDI LADIN 服装旗舰店（示例）</button>
+                <button class="chip" data-fill="XX 服饰有限公司">示例：XX 服饰有限公司</button>
+              </div>
+              <div class="evidence-input">
+                <label for="material-text">补充调查材料（可粘贴文字）</label>
+                <textarea id="material-text" maxlength="14000" placeholder="粘贴已经取得授权的材料摘录、经营数据及对应期间/统计口径。缺失信息可留空，系统会提示待核缺口。"></textarea>
+                <label for="material-files">或添加材料文件（TXT、MD、CSV、JSON；最多 4 个）</label>
+                <input id="material-files" type="file" multiple accept=".txt,.md,.csv,.json,text/plain,text/markdown,text/csv,application/json" />
+                <small>提交后材料会发送给配置的模型服务生成草稿。请仅上传合成或已获授权材料；不要填写身份证号、银行卡号等敏感个人信息。Demo 不保存调查记录。</small>
+              </div>
+            </div>
+          </section>
+
+          <section class="insight-marquee" aria-label="电商调查关注点">
+            <div class="insight-track">${ticker}</div>
+          </section>
+        </div>
+        <div class="home-cta">
+          <button id="start-btn" class="btn-primary">开始调查</button>
+          <div class="disclaimer">当前案例全部为合成数据，不指向真实企业，不构成真实调查结论或法律意见</div>
+        </div>
+      </div>`;
+
+    const input = document.querySelector('#query-input');
+    input.addEventListener('keydown', e => { if(e.key === 'Enter') document.querySelector('#start-btn').click(); });
+    document.querySelectorAll('[data-fill]').forEach(btn => btn.addEventListener('click', () => { input.value = btn.dataset.fill; input.focus(); }));
+    document.querySelector('#start-btn').addEventListener('click', async () => {
+      const value = input.value.trim();
+      if (!value) return showToast('请输入企业或店铺名称');
+      const manual = document.querySelector('#material-text').value.trim();
+      const files = [...document.querySelector('#material-files').files];
+      if (files.length > 4) return showToast('最多添加 4 个材料文件');
+      const materials = [];
+      if (manual) materials.push({ name: '手动录入材料', content: manual });
+      try {
+        for (const file of files) {
+          if (!/\.(txt|md|csv|json)$/i.test(file.name)) return showToast('文件仅支持 TXT、MD、CSV、JSON');
+          if (file.size > 100_000) return showToast('单个文件不能超过 100 KB');
+          materials.push({ name: file.name, content: await file.text() });
+        }
+      } catch { return showToast('读取材料失败，请检查文件后重试'); }
+      if (materials.reduce((sum, item) => sum + item.content.length, 0) > 14000) return showToast('材料合计不能超过 14000 个字符');
+      window.demoQuery = value;
+      window.demoMaterials = materials;
+      window.liveAnalysis = null;
+      currentFlowIndex = 0;
+      flowView = 'detail';
+      renderFlow();
+      location.hash = '#/flow';
+      setTimeout(() => scrollToModule(0, false), 60);
+    });
+  }
+
+  function starMarkup(count) {
+    return Array.from({ length: 5 }, (_, i) => `<svg class="star ${i < count ? 'on' : ''}" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg>`).join('');
+  }
+
+  function factMarkup(m) {
+    if (m.ratings) {
+      const ratings = m.ratings.map(r => `<div class="rating-row"><span class="rating-name">${r.label}</span><span class="rating-score">${r.score.toFixed(1)}</span><span class="rating-note">合成字段</span></div>`).join('');
+      return `<div class="fact-list reveal"><div class="rating-card"><div class="small-note">内置演示观测值（无真实店铺截图、观测日期或统计周期）</div>${ratings}</div>${m.facts.map(f => `<div class="fact-card">${f}</div>`).join('')}</div>`;
+    }
+    if (m.timeline) {
+      return `<div class="fact-list reveal"><div class="timeline">${m.timeline.map(t => `<div class="timeline-item"><span class="timeline-node ${t.debt ? 'debt' : ''}"></span><span class="timeline-date">${t.date}</span><span class="timeline-text">${t.text}</span></div>`).join('')}</div></div>`;
+    }
+    if (m.chain) {
+      return `<div class="fact-list reveal"><div class="chain-flow">${m.chain.map(x => `<div class="chain-node">${x}</div>`).join('')}</div>${m.facts.map(f => `<div class="fact-card">${f}</div>`).join('')}</div>`;
+    }
+    if (m.legal) {
+      return `<div class="fact-list reveal"><div class="legal-grid">
+        <div class="legal-block"><b>已有事实</b><span>${m.legal.fact}</span></div>
+        <div class="legal-block"><b>事实关系</b><span>${m.legal.relation}</span></div>
+        <div class="legal-block"><b>证据缺口</b><span>${m.legal.gap}</span></div>
+        <div class="legal-block"><b>下一步调证</b><span>${m.legal.next.join(' / ')}</span></div>
+      </div></div>`;
+    }
+    const facts = (m.facts || []).map(f => `<div class="fact-card">${f}</div>`).join('');
+    const next = (m.next || []).length ? `<div class="fact-card"><strong>下一步调查方向</strong>${m.next.join(' / ')}</div>` : '';
+    return `<div class="fact-list reveal">${facts}${next}</div>`;
+  }
+
+  function actionRail(id) {
+    return `<div class="action-rail">
+      <button class="rail-action" data-act="evidence" data-module="${id}"><span class="rail-icon">${icons.quote}</span><span class="rail-label">证据</span></button>
+      <button class="rail-action" data-act="ask" data-module="${id}"><span class="rail-icon">${icons.chat}</span><span class="rail-label">追问</span></button>
+      <button class="rail-action" data-act="save" data-module="${id}"><span class="rail-icon">${icons.star}</span><span class="rail-label">收藏</span></button>
+    </div>`;
+  }
+
+  function renderFlow() {
+    if (flowView === 'history') {
+      pages.flow.innerHTML = `
+        <div class="history-shell">
+          <header class="history-header">
+            <h1>历史调查记录</h1>
+            <p>点击店铺进入完整调查过程</p>
+          </header>
+          <div class="history-list">
+            <button class="history-card" id="open-history-case">
+              <div class="shop-head">
+                <div class="shop-avatar">M</div>
+                <div class="shop-meta">
+                  <div class="shop-name">${data.shop.name}</div>
+                  <div class="shop-sub">${data.shop.category} · 口碑字段 ${data.shop.score}（合成） · ${data.date}</div>
+                </div>
+                <span class="history-enter">进入</span>
+              </div>
+              <div class="history-meta">
+                <div class="history-cell"><span>经营主体</span><b>XX 服饰有限公司</b></div>
+                <div class="history-cell"><span>经营状态</span><b>材料待核</b></div>
+                <div class="history-cell"><span>风险线索</span><b class="history-risk">现实关系无法判断</b></div>
+              </div>
+              <div class="history-foot"><span>7 个合成演示模块</span><span>查看调查详情 ›</span></div>
+            </button>
+          </div>
+        </div>`;
+      document.querySelector('#open-history-case').addEventListener('click', () => {
+        window.demoQuery = data.query;
+        currentFlowIndex = 0;
+        flowView = 'detail';
+        renderFlow();
+        setTimeout(() => scrollToModule(0, false), 40);
+      });
+      return;
+    }
+
+    pages.flow.innerHTML = `
+      <div class="flow-page">
+        <header class="flow-header">
+          <div class="progress-line"><span id="progress-fill"></span></div>
+          <div class="flow-toprow">
+            <button class="flow-back" id="flow-back" aria-label="返回">${icons.back}</button>
+            <div class="flow-search">${escapeText(window.demoQuery || data.query)}</div>
+            <div class="flow-step" id="flow-step">第 1 / 7 步</div>
+          </div>
+          <nav class="step-nav" aria-label="调查步骤">${data.modules.map((m, i) => `<button class="step-button" data-step="${i}">${m.id} ${m.name}</button>`).join('')}</nav>
+        </header>
+        <div class="flow-scroller" id="flow-scroller">
+          ${data.modules.map((m, idx) => `
+            <article class="module-screen" data-index="${idx}" id="module-${m.id}">
+              <div class="module-kicker">模块 0${m.id}</div>
+              <h2 class="module-title">${m.name}</h2>
+              <div class="conclusion-line level-${m.level}"><span class="risk-dot"></span><span class="type-target" data-text="${m.conclusion}"></span></div>
+              ${factMarkup(m)}
+              <div class="source-row reveal"><span class="source-prefix">模拟来源标签（非原件）</span>${m.sources.map(s => `<span class="source-chip">${s}</span>`).join('')}</div>
+              ${m.id === 7 ? '<div class="generate-wrap reveal"><button id="generate-report" class="btn-primary">生成完整报告</button></div>' : ''}
+              ${actionRail(m.id)}
+            </article>`).join('')}
+        </div>
+      </div>`;
+
+    const scroller = document.querySelector('#flow-scroller');
+    const screens = [...document.querySelectorAll('.module-screen')];
+    const fill = document.querySelector('#progress-fill');
+    const step = document.querySelector('#flow-step');
+
+    function updateIndex(index) {
+      currentFlowIndex = Math.max(0, Math.min(6, index));
+      fill.style.width = `${((currentFlowIndex + 1) / 7) * 100}%`;
+      step.textContent = `第 ${currentFlowIndex + 1} / 7 步`;
+      playScreen(screens[currentFlowIndex]);
+      document.querySelectorAll('[data-step]').forEach((button, i) => {
+        if(i === currentFlowIndex) { button.setAttribute('aria-current','step'); const nav=button.parentElement; nav.scrollTo({left:button.offsetLeft-nav.clientWidth/2+button.offsetWidth/2,behavior:'smooth'}); }
+        else button.removeAttribute('aria-current');
+      });
+    }
+
+    let scrollTimer;
+    scroller.addEventListener('scroll', () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        const anchor = scroller.getBoundingClientRect().top + 50;
+        let index = 0;
+        screens.forEach((screen, i) => { if(screen.getBoundingClientRect().top <= anchor) index = i; });
+        updateIndex(index);
+      }, 50);
+    }, { passive: true });
+
+    document.querySelectorAll('[data-step]').forEach(button => button.addEventListener('click', () => scrollToModule(Number(button.dataset.step))));
+    document.querySelector('#flow-back').addEventListener('click', () => {
+      flowView = 'history';
+      renderFlow();
+    });
+    document.querySelectorAll('.rail-action').forEach(btn => btn.addEventListener('click', () => {
+      if (btn.dataset.act === 'evidence') showToast('已加入证据清单');
+      if (btn.dataset.act === 'ask') showToast('追问功能演示中');
+      if (btn.dataset.act === 'save') { btn.classList.toggle('saved'); showToast(btn.classList.contains('saved') ? '已收藏' : '已取消收藏'); }
+    }));
+    document.querySelector('#generate-report')?.addEventListener('click', async (event) => {
+      const button = event.currentTarget;
+      button.disabled = true;
+      button.textContent = '正在生成材料分析草稿…';
+      try {
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ storeName: window.demoQuery || data.query, materials: window.demoMaterials || [] }),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || '分析暂时失败，请稍后重试。');
+        window.liveAnalysis = result;
+        renderReport();
+        location.hash = '#/report';
+      } catch (error) {
+        showToast(error.message || '连接模型服务失败，请稍后重试');
+      } finally {
+        button.disabled = false;
+        button.textContent = '生成完整报告';
+      }
+    });
+    setTimeout(() => updateIndex(currentFlowIndex), 50);
+  }
+
+  function playScreen(screen) {
+    if (!screen || screen.dataset.played === '1') return;
+    screen.dataset.played = '1';
+    screen.classList.add('play');
+    const target = screen.querySelector('.type-target');
+    const text = target?.dataset.text || '';
+    if (!target || !text) return;
+    target.textContent = '';
+    let i = 0;
+    const timer = setInterval(() => {
+      target.textContent += text[i] || '';
+      i += 1;
+      if (i >= text.length) clearInterval(timer);
+    }, 28);
+  }
+
+  function scrollToModule(index, smooth = true) {
+    currentFlowIndex = Math.max(0, Math.min(6, Number(index) || 0));
+    const scroller = document.querySelector('#flow-scroller');
+    const target = document.querySelector(`.module-screen[data-index="${currentFlowIndex}"]`);
+    if (scroller && target) scroller.scrollTo({ top: scroller.scrollTop + target.getBoundingClientRect().top - scroller.getBoundingClientRect().top, behavior: smooth ? 'smooth' : 'auto' });
+  }
+
+  function renderReport() {
+    const timeline = data.modules[3].timeline;
+    const chain = data.modules[4].chain;
+    const next = data.modules[5].legal.next;
+    const matrix = [
+      ['主体', '债务主体为 XX 服饰有限公司｜演示设定', '“债务材料＋工商公示”只是模拟来源标签，无真实原件。'],
+      ['主体', '店铺营业执照主体与债务主体一致｜演示设定', '无真实店铺资质页；不能称主体归属已核验。'],
+      ['主体', '商标权利人与店铺同一实际控制人｜缺失', '名称相似不足以证明；缺股权/控制关系链。'],
+      ['主体', '主体明细（注册号/成立日期/股东/法人）｜待确认', '无真实工商明细；成立年限不可推算。'],
+      ['主体', '实际控制人认定路径｜缺失', '缺股权穿透、任职或地址等可核关系证据。'],
+      ['经营状态', '成立 4 年、经营基础较强｜待确认', '缺注册日期；成立与开店日期需分别确认。'],
+      ['经营状态', '差评占比 17%｜缺失', '差评定义、数目、总评价数、期间和去重口径未知。'],
+      ['经营状态', '近 6 个月经营范围发生变更｜缺失', '缺变更内容、时间及原始公示。'],
+      ['经营状态', '评分 4.6/4.9/4.8/4.8｜演示字段', '合成观测值；无日期、统计期间或真实店铺截图。'],
+      ['经营状态', '早期同口径评分｜缺失', '不能据当前值判断评分下滑。'],
+      ['经营状态', '15% 差评率阈值｜无依据', '未提供自定义评分 PRD；不作为规则使用。'],
+      ['财务状态', '月收入 300 万陈述｜缺失', '无原文、陈述主体、期间和指标口径。'],
+      ['财务状态', '近 90 天月均销售约 60 万｜演示字段/待核', '来源、估算方法、退款税费及指标口径未知；不得当作实测值。'],
+      ['财务状态', '库存量远大于销售量｜缺失', '无数值、单位、库存时点、销量期间或比较阈值。'],
+      ['财务状态', '300 万与 60 万可比口径｜缺失', '主体/期间/指标类型未对齐，输出无法比较。'],
+      ['异常变化', '2025-06 债务形成｜演示时间线/待核', '无债务金额、债权人、案号或文书原件。'],
+      ['异常变化', '2025-09 原店铺销量下降约 70%｜缺失', '缺指标定义、起止数值和比较期间。'],
+      ['异常变化', '2025-10 关联公司成立｜缺失', '缺工商资料及股权/法人/地址/人员关联依据。'],
+      ['异常变化', '2025-11 新店开业并承接类目｜缺失', '缺开业时间、主体及 SKU/主图/货号等承接样本。'],
+      ['异常变化', '核查方向｜保留为流程要求', '调取债务材料、历史经营、工商穿透、新店主体与人货店地样本。'],
+      ['异常变化', '完成标准｜规则未校准', '日期均需有出处；销量需同口径前后值和期间；关联需多项可区分的证据，不以单一名称重合作结论。'],
+      ['资产转移', '原主体经营价值明显减少｜缺失', '需有销售额/订单量/在架商品等可比量化数据。'],
+      ['资产转移', '关联主体同期经营增长｜缺失', '无新主体/新店经营增长材料。'],
+      ['资产转移', '双方关联依据｜缺失', '无股权/法人/地址/人员关系证据。'],
+      ['资产转移', '业务连续性证据｜缺失', '无 SKU/货号/主图/发货地/客服可核样本。'],
+      ['资产转移', '核查方向｜保留为流程要求', '分别检查人、货、店、地信号，并验证时间匹配及来源独立性。'],
+      ['资产转移', '完成标准｜置信度门槛未校准', '不把“至少2–3维”或“80%+”作为自动判定规则；没有流水时资金关系仍未知。'],
+      ['法律尽调', '债务后经营下降及关联主体承接｜待确认', '依赖前述缺失项，当前不能作为事实。'],
+      ['法律尽调', '两公司资产/收入/结算关系｜缺失', '无平台结算、合同、资金往来原件。'],
+      ['法律尽调', '核查方向｜保留为流程要求', '核对店铺历史主体、结算主体、合同主体、资金往来。'],
+      ['法律尽调', '完成标准｜直接证据', '结算流水/合同/付款凭证缺一时不得推定；无法取得则维持无法确认。'],
+      ['调查总控', '“经营与财务一致性已核验”｜不成立', '与当前缺口矛盾，应删除。'],
+      ['调查总控', '“流程已跑通，关键证据待补”｜有限表述', '仅说明演示页面流程，不代表 AI 实际核验或人工审核通过。']
+    ];
+    const qaUnknowns = [
+      '主体关系：没有真实资质或控制关系材料时，实际控制人关系无法判断。',
+      '评分趋势：没有早期同口径评分时，不能称评分下滑。',
+      '收入比较：300 万原文/期间或 60 万口径不明时，输出无法比较。',
+      '差评比例：没有差评定义、差评数、评价总数与期间时，无法判断 17%。',
+      '经营变化：没有同口径起止数值与比较期间时，无法判断下降 70%。',
+      '关联迁移：缺工商关系和业务连续性样本时，无法判断关联或承接。',
+      '资金关系：缺结算、合同或付款凭证时，无法判断资产/收入/结算关系。'
+    ];
+    const classifications = [
+      ['可确认（限于演示事实）', '本案例被标为合成演示；源码中确实包含这些字段。不得把字段存在于代码等同于现实企业确有其事。'],
+      ['线索（源码断言）', '2025年债务与后续经营变化、300万/60万、17%差评及下降70%等均只是合成场景设定，没有独立原始材料。'],
+      ['无法判断', '实际控制人、评分趋势、经营/财务是否不一致、关联承接、资产转移及资金关系均无法据当前材料判断。']
+    ];
+    const ledger = [
+      ['300 万', '主体、期间、指标类型、退款税费与原文均未知', '无法判断；不得与 60 万直接比较'],
+      ['60 万', '仅有“近90天月均”演示描述；主体、算法和含退款税费口径未知', '无法比较'],
+      ['17%', '差评定义、分子分母、期间、去重方式均未知', '无法判断；15%阈值无依据'],
+      ['下降70%', '指标、起止值及环比/同比期间均未知', '无法判断/无法比较'],
+      ['库存远大于销量', '单位、库存时点、销量期间和触发阈值均未知', '无法比较']
+    ];
+    const list = rows => rows.map(x => `<li>${x}</li>`).join('');
+    const table = rows => rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('');
+    pages.report.innerHTML = `
+      <div class="report-shell">
+        <header class="report-header"><h1>调查报告</h1><span class="report-badge">${window.liveAnalysis ? '本次材料 AI 草稿 + 固定合成参考' : '合成演示案例'}</span></header>
+        <div class="report-content">
+          ${window.liveAnalysis?.report ? `
+          <section class="live-analysis">
+            <div class="section-title">本次材料分析草稿 · ${escapeText(window.demoQuery || data.query)}</div>
+            <p class="live-analysis-note">${escapeText(window.liveAnalysis.report.summary)}<br>仅根据本次输入生成，模型未独立核验来源、真实性或现实关系；下方固定案例内容仅作流程演示。</p>
+            ${(window.liveAnalysis.report.findings || []).map(item => `
+              <article class="live-finding">
+                <h3>${escapeText(item.topic)} <span class="live-status">${escapeText(item.status)}</span></h3>
+                <p><strong>结论：</strong>${escapeText(item.conclusion)}</p>
+                ${item.evidence?.length ? `<p><strong>依据（原文摘录）：</strong></p>${item.evidence.map(source => `<blockquote>${escapeText(source.material)}：${escapeText(source.quote)}</blockquote>`).join('')}` : '<p><strong>依据：</strong>没有可引用的原文材料。</p>'}
+                ${item.gaps?.length ? `<p><strong>缺口：</strong>${item.gaps.map(escapeText).join('；')}</p>` : ''}
+                ${item.nextSteps?.length ? `<p><strong>建议补充：</strong>${item.nextSteps.map(escapeText).join('；')}</p>` : ''}
+              </article>`).join('')}
+            <p class="live-analysis-note">限制：${escapeText(window.liveAnalysis.report.limitations)} · 模型：${escapeText(window.liveAnalysis.model || '已配置模型')} · 未保存到调查历史</p>
+          </section>` : ''}
+          <section class="score-hero">
+            <div class="score-label">经营可信度评分</div>
+            <div class="score-grade">待确认 · 本报告不计分</div>
+            <div class="score-desc">自定义可信度评分的定义、权重、计算公式、15%阈值和等级区间没有 PRD 支持，故隐藏总分与分项分数。附带手册提到商家体验分89–92对应消费者端4.8/5星；这不等于本产品的可信度评分，也不能验证当前合成店铺的观测值。</div>
+          </section>
+
+          <section class="report-banner">
+            <div class="banner-main"><span class="risk-dot"></span><span>${data.headline}</span></div>
+            <div class="banner-sub">对象：${data.query} · ${data.date}｜所有事实、时间线和来源标签均为合成演示数据；不指向真实企业或个人，不得作为真实调查成果或用于实质决策。</div>
+          </section>
+
+          <section class="section-card full-width">
+            <div class="section-title">事实 / 线索 / 无法判断</div>
+            <div class="classification-list">${classifications.map(([title, body]) => `<div class="classification-item"><strong>${title}</strong><span>${body}</span></div>`).join('')}</div>
+          </section>
+
+          <section class="section-card">
+            <div class="section-title">模块结果总览</div>
+            ${data.modules.map((m, idx) => `<button class="overview-row" data-jump="${idx}"><span class="overview-no">0${m.id}</span><span class="overview-name">${m.name}</span><span class="overview-status level-${m.level}">${m.keyword}</span></button>`).join('')}
+          </section>
+
+          <section class="section-card">
+            <div class="section-title">合成事件时间线（不证明因果或现实发生）</div>
+            <div class="report-timeline"><div class="timeline">${timeline.map(t => `<div class="timeline-item"><span class="timeline-node ${t.debt ? 'debt' : ''}"></span><span class="timeline-date">${t.date}</span><span class="timeline-text">${t.text}</span></div>`).join('')}</div></div>
+          </section>
+
+          <section class="section-card">
+            <div class="section-title">核验路径（当前没有真实证据闭环）</div>
+            <div class="evidence-chain">${chain.map((x, i) => `${i ? `<span class="evidence-arrow">${icons.arrow}</span>` : ''}<span class="evidence-node">${x}</span>`).join('')}</div>
+          </section>
+
+          <section class="section-card full-width">
+            <div class="section-title">「结论—依据—缺口」确认清单 · 逐项核对</div>
+            <div class="table-scroll"><table class="check-table"><thead><tr><th>模块</th><th>核对项与状态</th><th>依据、缺口与处理</th></tr></thead><tbody>${table(matrix)}</tbody></table></div>
+          </section>
+
+          <section class="section-card">
+            <div class="section-title">人工参考答案 · 必须回答无法判断</div>
+            <ul class="check-list">${list(qaUnknowns)}</ul>
+            <p class="small-note">测试变体 A 应把“法律主体对应”与“商标权利人/实际控制关系”分开；移除商标来源只影响后者，不自动推翻前者。变体 B 若债务主体与店铺执照主体冲突，应标为主体冲突并停止自动归并。</p>
+            <p class="small-note">证据缺失时不补编事实。合成数据只能作为 QA fixture 的预期输入，不能作为现实调查事实。</p>
+          </section>
+
+          <section class="section-card">
+            <div class="section-title">数据口径台账</div>
+            <div class="table-scroll"><table class="check-table"><thead><tr><th>字段</th><th>缺失口径</th><th>系统处理</th></tr></thead><tbody>${table(ledger)}</tbody></table></div>
+          </section>
+
+          <section class="section-card">
+            <div class="section-title">下一步材料清单</div>
+            <div class="next-list">${next.map(x => `<div class="next-item"><span class="next-square"></span><span>${x}</span></div>`).join('')}</div>
+            <div class="small-note">主体/店铺资质样张；带口径和日期的两期经营数据；如演示迁移，再补模拟新旧主体资料及人货店地样本。所有材料必须标注“合成示例”。</div>
+          </section>
+        </div>
+        <div class="report-actions">
+          <button id="export-report" class="btn-ghost">导出报告</button>
+          <button id="restart" class="btn-primary">重新调查</button>
+        </div>
+      </div>`;
+
+    document.querySelectorAll('[data-jump]').forEach(btn => btn.addEventListener('click', () => {
+      currentFlowIndex = Number(btn.dataset.jump);
+      flowView = 'detail';
+      renderFlow();
+      location.hash = '#/flow';
+      setTimeout(() => scrollToModule(currentFlowIndex, false), 80);
+    }));
+    document.querySelector('#export-report').addEventListener('click', () => showToast('演示版暂不支持导出'));
+    document.querySelector('#restart').addEventListener('click', () => location.hash = '#/home');
+  }
+
+  function route() {
+    const key = (location.hash || '#/home').replace('#/', '');
+    const safe = pages[key] ? key : 'home';
+    Object.entries(pages).forEach(([name, node]) => node.classList.toggle('active', name === safe));
+    tabs.forEach(tab => { const active=tab.dataset.route === `#/${safe}`; tab.classList.toggle('active',active); if(active)tab.setAttribute('aria-current','page');else tab.removeAttribute('aria-current'); });
+    window.scrollTo(0,0);
+    if (safe === 'flow' && flowView === 'detail') setTimeout(() => scrollToModule(currentFlowIndex, false), 40);
+  }
+
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    if (tab.dataset.route === '#/flow') {
+      flowView = 'history';
+      renderFlow();
+    }
+    location.hash = tab.dataset.route;
+  }));
+
+  renderHome();
+  renderFlow();
+  renderReport();
+  window.addEventListener('hashchange', route);
+  if (!location.hash) location.hash = '#/home'; else route();
+})();
+
+</script>
+<script>
+(() => {
+  const input=document.querySelector('#global-search-input');
+  const btn=document.querySelector('#global-search-btn');
+  function go(){
+    const v=input.value.trim();
+    location.hash='#/home';
+    setTimeout(()=>{
+      const home=document.querySelector('#query-input');
+      if(home && v){home.value=v; home.focus();}
+    },30);
+  }
+  btn.addEventListener('click',go);
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+})();
+</script>
+</body></html>
