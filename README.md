@@ -43,7 +43,7 @@ python3 -m http.server 8080
 1. 在 EdgeOne Makers 导入本仓库，或上传仓库根目录内的文件。无需前端构建命令。
 2. 确保 `cloud-functions/api/` 位于部署根目录下，使 Makers 识别 `/api/analyze` 和 `/api/search`。
 3. 在项目的服务端环境变量里设置 `AI_GATEWAY_BASE_URL`、`AI_GATEWAY_MODEL` 和 `AI_GATEWAY_API_KEY`，参考 `.env.example`。本项目当前使用 Agent Plan，必须使用其专属 Base URL、专属 Key 和套餐可调用的模型。
-4. 在 Agent Plan Harness 中确认豆包搜索已开启；重新部署使变量生效。输入店铺名后可点击「搜索公开网页」，勾选线索或补充材料，进入调查流程后点击「生成完整报告」。
+4. 在 Agent Plan Harness 中确认豆包搜索已开启；重新部署使变量生效。输入店铺名，选择公开网页来源后点击「豆包搜索」，勾选线索或补充材料，进入调查流程后点击「生成完整报告」。
 5. 检查报告是否显示本次材料的 AI 分析与原文依据。固定合成案例不能视为模型调用成功的证明。
 
 详见 [运行说明](RUNNING.md) 和 [EdgeOne 部署说明](README-EDGEONE-MAKERS.md)。
