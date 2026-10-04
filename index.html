@@ -53,6 +53,7 @@ body{min-width:1024px;overflow-x:hidden} button,input{font:inherit} button{color
 .hero-card{background:transparent;padding:26px 0 8px;max-width:930px}.hero-kicker{font-size:14px;color:var(--primary);font-weight:600;margin-bottom:14px}.hero-card h1{margin:0;font-size:42px;line-height:1.18;letter-spacing:-1px;font-weight:700;color:#fff}.hero-card p{margin:16px 0 0;color:var(--text-3);font-size:16px;line-height:1.7}
 .query-box{margin-top:28px;width:min(760px,100%);background:var(--bg-elev);border-radius:16px;padding:10px 12px 12px;border:1px solid rgba(255,255,255,.06);box-shadow:0 10px 40px rgba(0,0,0,.16)}
 .evidence-input{display:grid;gap:8px;padding:12px 2px 2px}.evidence-input label{font-size:12px;color:var(--text-2)}.evidence-input textarea{width:100%;min-height:96px;resize:vertical;border:1px solid var(--line-2);border-radius:9px;background:rgba(0,0,0,.14);color:var(--text-1);padding:10px;font:inherit;font-size:13px;line-height:1.55}.evidence-input input[type=file]{max-width:100%;font-size:12px;color:var(--text-3)}.evidence-input small{font-size:11px;line-height:1.55;color:var(--text-4)}
+.public-search{margin-top:12px}.public-search button{border:1px solid var(--line-2);background:rgba(255,255,255,.07);color:var(--text-1);border-radius:8px;padding:8px 12px;cursor:pointer}.public-search button:disabled{opacity:.6;cursor:wait}.public-results{display:grid;gap:7px;margin-top:9px;max-height:240px;overflow:auto}.public-result{display:flex;gap:8px;align-items:start;padding:9px;border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--text-2)}.public-result input{margin-top:3px}.public-result a{color:#8cc8ff;word-break:break-all}.public-result p{margin:4px 0;line-height:1.45}
 .query-input-row{height:48px;display:flex;align-items:center;gap:10px}.query-input-row>svg{width:20px;height:20px;color:var(--text-3);margin-left:4px}.query-input-row input{flex:1;border:0;outline:0;background:transparent;color:#fff;font-size:16px}.query-input-row input::placeholder{color:var(--text-4)}
 .chips{display:flex;gap:8px;flex-wrap:wrap;padding-top:9px;border-top:1px solid var(--line)}.chip{border:0;border-radius:8px;background:rgba(255,255,255,.06);color:var(--text-3);font-size:12px;padding:7px 10px;cursor:pointer}.chip:hover{background:rgba(255,255,255,.1);color:var(--text-1)}
 .insight-marquee{margin-top:38px;width:100%;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);padding:4px 0}.insight-track{display:flex;width:max-content;gap:10px;animation:ticker 35s linear infinite}.insight-marquee:hover .insight-track{animation-play-state:paused}.insight-tag{flex:none;padding:10px 14px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--text-2);font-size:13px}.insight-tag.hot{color:#ff9db0;background:rgba(254,44,85,.08);border-color:rgba(254,44,85,.18)}@keyframes ticker{to{transform:translateX(-50%)}}
@@ -262,7 +263,7 @@ window.DEMO_DATA = {
       <div class="home-shell">
         <div class="home-content">
           <section class="hero-card">
-            <div class="hero-kicker">电商经营核验助手 · 合成演示版</div>
+            <div class="hero-kicker">电商经营核验助手 · 公开线索与合成案例</div>
             <h1>拆解经营信号<br>看清证据与缺口</h1>
             <p>按可核验事实、待核线索与无法判断整理商家经营材料。</p>
             <div class="query-box">
@@ -270,6 +271,12 @@ window.DEMO_DATA = {
               <div class="chips">
                 <button class="chip" data-fill="MARDI LADIN 服装旗舰店">MARDI LADIN 服装旗舰店（示例）</button>
                 <button class="chip" data-fill="XX 服饰有限公司">示例：XX 服饰有限公司</button>
+              </div>
+              <div class="public-search">
+                <button id="public-search-btn" type="button">搜索公开网页</button>
+                <small>豆包搜索仅提供公开网页线索；同名、近似品牌可能混入。请核对主体与网址，勾选后才会加入分析。</small>
+                <div id="public-search-status" role="status"></div>
+                <div id="public-search-results" class="public-results"></div>
               </div>
               <div class="evidence-input">
                 <label for="material-text">补充调查材料（可粘贴文字）</label>
@@ -287,11 +294,58 @@ window.DEMO_DATA = {
         </div>
         <div class="home-cta">
           <button id="start-btn" class="btn-primary">开始调查</button>
-          <div class="disclaimer">当前案例全部为合成数据，不指向真实企业，不构成真实调查结论或法律意见</div>
+          <div class="disclaimer">固定演示案例为合成数据；公开搜索结果未经核验，不构成真实调查结论或法律意见</div>
         </div>
       </div>`;
 
     const input = document.querySelector('#query-input');
+    let publicResults = [];
+    let searchedQuery = '';
+    document.querySelector('#public-search-btn').addEventListener('click', async () => {
+      const query = input.value.trim();
+      if (!query) return showToast('请先输入企业或店铺名称');
+      const button = document.querySelector('#public-search-btn');
+      const status = document.querySelector('#public-search-status');
+      const container = document.querySelector('#public-search-results');
+      button.disabled = true;
+      status.textContent = '正在搜索公开网页…';
+      container.replaceChildren();
+      publicResults = [];
+      searchedQuery = '';
+      try {
+        const response = await fetch('/api/search', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || '搜索失败');
+        publicResults = data.results || [];
+        searchedQuery = query;
+        status.textContent = publicResults.length ? `找到 ${publicResults.length} 条公开网页线索；请核对来源并勾选需要分析的内容。` : '没有找到可用的公开网页结果，请手动添加材料。';
+        publicResults.forEach((result, index) => {
+          const row = document.createElement('label');
+          row.className = 'public-result';
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.dataset.searchIndex = String(index);
+          const content = document.createElement('span');
+          const title = document.createElement('strong');
+          title.textContent = result.title;
+          const link = document.createElement('a');
+          link.href = result.url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = result.url;
+          const snippet = document.createElement('p');
+          snippet.textContent = result.snippet || '无摘要';
+          content.append(title, document.createElement('br'), link, snippet);
+          row.append(checkbox, content);
+          container.append(row);
+        });
+      } catch (error) { status.textContent = error.message || '搜索失败，请稍后重试。'; }
+      finally { button.disabled = false; }
+    });
     document.querySelectorAll('[data-fill]').forEach(btn => btn.addEventListener('click', () => { input.value = btn.dataset.fill; input.focus(); }));
     document.querySelector('#start-btn').addEventListener('click', async () => {
       const value = input.value.trim();
@@ -301,6 +355,12 @@ window.DEMO_DATA = {
       if (files.length > 4) return showToast('最多添加 4 个材料文件');
       const materials = [];
       if (manual) materials.push({ name: '手动录入材料', content: manual });
+      const selected = [...document.querySelectorAll('[data-search-index]:checked')].map(box => publicResults[Number(box.dataset.searchIndex)]).filter(Boolean);
+      if (selected.length && searchedQuery !== value) return showToast('店铺名称已更改，请重新搜索公开网页');
+      if (selected.length) materials.push({
+        name: '豆包搜索公开网页线索（未经原文核验）',
+        content: selected.map((item, index) => `[公开网页线索 ${index + 1}] 标题：${item.title}\n网址：${item.url}\n摘要：${item.snippet || '无'}\n说明：这是搜索摘要，不代表原文或事实已核验。`).join('\n\n')
+      });
       try {
         for (const file of files) {
           if (!/\.(txt|md|csv|json)$/i.test(file.name)) return showToast('文件仅支持 TXT、MD、CSV、JSON');
@@ -690,7 +750,7 @@ window.DEMO_DATA = {
     location.hash='#/home';
     setTimeout(()=>{
       const home=document.querySelector('#query-input');
-      if(home && v){home.value=v; home.focus();}
+      if(home && v){home.value=v; home.focus(); document.querySelector('#public-search-btn')?.click();}
     },30);
   }
   btn.addEventListener('click',go);

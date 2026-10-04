@@ -6,9 +6,10 @@
 
 - Web 与手机演示页面，七个模块展示调查流程。
 - 手动录入文字，或上传 TXT、MD、CSV、JSON 文件（最多 4 个，合计 14000 字符）。
+- 豆包搜索公开网页：输入店铺或企业名称，查看来源网址并勾选线索后再纳入分析。
 - 服务端通过 OpenAI Chat Completions 兼容接口生成分析草稿。
 - 逐字检查模型引用是否存在于输入材料中，不匹配的引用会被剔除。
-- 内置案例与固定流程为合成演示，不代表真实企业结论；模型输出只依据提交文字，未核验原件。
+- 内置案例与固定流程为合成演示，不代表真实企业结论；公开搜索的摘要也只作为未经核验的线索。
 
 ## 源码结构
 
@@ -16,6 +17,7 @@
 index.html                       Web Demo
 app.html                         手机端 Demo
 cloud-functions/api/analyze.js   EdgeOne Makers AI 接口
+cloud-functions/api/search.js    EdgeOne Makers 豆包搜索接口
 README-EDGEONE-MAKERS.md          部署及环境变量说明
 RUNNING.md                       本地运行和验收步骤
 .env.example                    环境变量填写示例（无密钥）
@@ -37,19 +39,19 @@ python3 -m http.server 8080
 ## 运行真实 AI
 
 1. 在 EdgeOne Makers 导入本仓库，或上传仓库根目录内的文件。无需前端构建命令。
-2. 确保 `cloud-functions/api/analyze.js` 位于部署根目录下，使 Makers 识别 `/api/analyze`。
+2. 确保 `cloud-functions/api/` 位于部署根目录下，使 Makers 识别 `/api/analyze` 和 `/api/search`。
 3. 在项目的服务端环境变量里设置 `AI_GATEWAY_BASE_URL`、`AI_GATEWAY_MODEL` 和 `AI_GATEWAY_API_KEY`，参考 `.env.example`。本项目当前使用 Agent Plan，必须使用其专属 Base URL、专属 Key 和套餐可调用的模型。
-4. 重新部署使变量生效。输入店铺名和材料，进入调查流程后点击「生成完整报告」。
+4. 在 Agent Plan Harness 中确认豆包搜索已开启；重新部署使变量生效。输入店铺名后可点击「搜索公开网页」，勾选线索或补充材料，进入调查流程后点击「生成完整报告」。
 5. 检查报告是否显示本次材料的 AI 分析与原文依据。固定合成案例不能视为模型调用成功的证明。
 
 详见 [运行说明](RUNNING.md) 和 [EdgeOne 部署说明](README-EDGEONE-MAKERS.md)。
 
 ## 当前状态与限制
 
-- 前端和云函数已经在 Makers 完成部署；2026-10-04 切换 Agent Plan 专属地址与套餐可调用模型后，线上合成材料测试已成功生成 AI 分析草稿。持续可用性仍需在活动期间观察。
+- 前端和云函数已经在 Makers 完成部署；2026-10-04 线上已验证豆包搜索返回公开网页结果，勾选后可生成标明“未经核验线索”的 AI 草稿。持续可用性仍需在活动期间观察。
 - 当前 Makers 项目尚未关联本 GitHub 仓库；提交到 GitHub 后仍需手动重新部署，或先完成仓库关联。
 - `/api/analyze` 的 GET 返回只证明路由存活，不证明模型密钥、模型权限或额度可用。
-- 无数据库、登录、OCR、联网查档；页面刷新后输入不持久保存。提交文字会传给配置的模型供应商，其数据处理政策需另行核对。
+- 无数据库、登录、OCR或平台后台查档；公开网页搜索不等于抖店经营数据。页面刷新后输入不持久保存。提交文字会传给配置的模型供应商，其数据处理政策需另行核对。
 - 限流仅在单实例内生效。长期公开运行仍需平台级限流、预算控制与运行监控。
 - Makers 临时预览链接有时限；长期展示需绑定可持续访问的域名。
 - 不上传 API Key、账号配置、真实调查原件或个人敏感信息。请用合成或获授权材料演示。
