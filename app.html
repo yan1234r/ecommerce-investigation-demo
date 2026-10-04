@@ -52,7 +52,7 @@ body{min-width:1024px;overflow-x:hidden} button,input{font:inherit} button{color
 .home-content{max-width:1180px;margin:0 auto;padding:42px 40px 120px}
 .hero-card{background:transparent;padding:26px 0 8px;max-width:930px}.hero-kicker{font-size:14px;color:var(--primary);font-weight:600;margin-bottom:14px}.hero-card h1{margin:0;font-size:42px;line-height:1.18;letter-spacing:-1px;font-weight:700;color:#fff}.hero-card p{margin:16px 0 0;color:var(--text-3);font-size:16px;line-height:1.7}
 .query-box{margin-top:28px;width:min(760px,100%);background:var(--bg-elev);border-radius:16px;padding:10px 12px 12px;border:1px solid rgba(255,255,255,.06);box-shadow:0 10px 40px rgba(0,0,0,.16)}
-.public-search{margin-top:12px}.public-search select{max-width:100%;margin:0 8px 8px 0;padding:8px 10px;border:1px solid var(--line-2);border-radius:8px;background:var(--bg-elev);color:var(--text-1)}.public-search button{border:1px solid var(--line-2);background:rgba(255,255,255,.07);color:var(--text-1);border-radius:8px;padding:8px 12px;cursor:pointer}.public-search button:disabled{opacity:.6;cursor:wait}.public-results{display:grid;gap:7px;margin-top:9px;max-height:240px;overflow:auto}.public-result{display:flex;gap:8px;align-items:start;padding:9px;border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--text-2)}.public-result input{margin-top:3px}.public-result a{color:#8cc8ff;word-break:break-all}.public-result p{margin:4px 0;line-height:1.45}
+.public-search{margin-top:12px}.public-search select{max-width:100%;margin:0 8px 8px 0;padding:8px 10px;border:1px solid var(--line-2);border-radius:8px;background:var(--bg-elev);color:var(--text-1)}.public-search button,.public-search>a{display:inline-block;border:1px solid var(--line-2);background:rgba(255,255,255,.07);color:var(--text-1);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;text-decoration:none}.public-search button:disabled{opacity:.6;cursor:wait}.public-results{display:grid;gap:7px;margin-top:9px;max-height:240px;overflow:auto}.public-result input{margin-top:3px}.public-result a{color:#8cc8ff;word-break:break-all}.public-result p{margin:4px 0;line-height:1.45}
 .evidence-input{display:grid;gap:8px;padding:12px 2px 2px}.evidence-input label{font-size:12px;color:var(--text-2)}.evidence-input textarea{width:100%;min-height:96px;resize:vertical;border:1px solid var(--line-2);border-radius:9px;background:rgba(0,0,0,.14);color:var(--text-1);padding:10px;font:inherit;font-size:13px;line-height:1.55}.evidence-input input[type=file]{max-width:100%;font-size:12px;color:var(--text-3)}.evidence-input small{font-size:11px;line-height:1.55;color:var(--text-4)}
 .query-input-row{height:48px;display:flex;align-items:center;gap:10px}.query-input-row>svg{width:20px;height:20px;color:var(--text-3);margin-left:4px}.query-input-row input{flex:1;border:0;outline:0;background:transparent;color:#fff;font-size:16px}.query-input-row input::placeholder{color:var(--text-4)}
 .chips{display:flex;gap:8px;flex-wrap:wrap;padding-top:9px;border-top:1px solid var(--line)}.chip{border:0;border-radius:8px;background:rgba(255,255,255,.06);color:var(--text-3);font-size:12px;padding:7px 10px;cursor:pointer}.chip:hover{background:rgba(255,255,255,.1);color:var(--text-1)}
@@ -292,7 +292,9 @@ window.DEMO_DATA = {
                 <label for="search-scope">公开网页来源</label>
                 <select id="search-scope" aria-label="公开网页来源"><option value="web">全部公开网页</option><option value="douyin">抖音店铺公开页</option><option value="chanmama">蝉妈妈公开页</option><option value="qcc">企查查公开页</option></select>
                 <button id="public-search-btn" type="button">豆包搜索</button>
+                <a id="douyin-search-btn" href="https://www.douyin.com/search/" target="_blank" rel="noopener noreferrer">在抖音打开搜索</a>
                 <small>按来源检索公开页面，非抖店、蝉妈妈或企查查的授权数据接口。仅展示对应域名的结果；搜索摘要未经原文核验，请核对主体与网址。</small>
+                <small>抖音直达入口会打开该店铺名的抖音搜索页。抖音可能要求登录；请自行核对店铺主体，再把可使用的材料录入或上传。此入口不会自动读取抖音后台数据。</small>
                 <div id="public-search-status" role="status"></div>
                 <div id="public-search-results" class="public-results"></div>
               </div>
@@ -320,6 +322,14 @@ window.DEMO_DATA = {
     let publicResults = [];
     const selectedResults = new Map();
     let searchedQuery = '';
+    document.querySelector('#douyin-search-btn').addEventListener('click', (event) => {
+      const query = input.value.trim();
+      if (!query) {
+        event.preventDefault();
+        return showToast('请先输入抖音店铺名称');
+      }
+      event.currentTarget.href = `https://www.douyin.com/search/${encodeURIComponent(query)}`;
+    });
     document.querySelector('#public-search-btn').addEventListener('click', async () => {
       const query = input.value.trim();
       if (!query) return showToast('请先输入企业或店铺名称');
